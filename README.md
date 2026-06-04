@@ -14,4 +14,4 @@ An advanced, client-side financial analytics web application designed to optimiz
 
 ## 💻 How To Run
 Launch the application instantly through the live production interface hosted via GitHub Pages:
-👉 **[https://Sasipranvithaa.github.io/personal-finance-tracker/](https://Sasipranvithaa.github.io/personal-finance-tracker/)**
+👉 ** [https://sasipranvithaa.github.io/Smart-core-finance-tracker/](https:// https://sasipranvithaa.github.io/Smart-core-finance-tracker//)**
