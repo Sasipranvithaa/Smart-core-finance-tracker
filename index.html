@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Smart-Core Finance Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f0f4f8;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: #ffffff;
+            width: 100%;
+            max-width: 500px;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #1e293b;
+            font-weight: 700;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .card {
+            background: #1e293b;
+            color: #fff;
+            padding: 15px;
+            text-align: center;
+            border-radius: 10px;
+        }
+
+        .card h3 {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            opacity: 0.7;
+            margin-bottom: 5px;
+            letter-spacing: 0.5px;
+        }
+
+        .card h1 {
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .goal-card { background: #0284c7; }
+
+        /* Time-to-Broke Barometer UI */
+        .barometer-card {
+            grid-column: span 2;
+            background: #b91c1c;
+            color: white;
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: none;
+        }
+
+        .progress-container {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            height: 10px;
+            width: 100%;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background: #10b981;
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .section-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .section-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #334155;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group { margin-bottom: 10px; }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 4px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            outline: none;
+            background: #fff;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            font-weight: 700;
+            transition: background 0.2s;
+        }
+
+        .btn-blue { background: #0284c7; }
+        .btn-blue:hover { background: #0369a1; }
+        .btn-green { background: #10b981; }
+        .btn-green:hover { background: #047857; }
+
+        .alert-box {
+            display: none;
+            background: #fef3c7;
+            border-left: 5px solid #f59e0b;
+            color: #78350f;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        .transaction-list {
+            list-style: none;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            background: #ffffff;
+            padding: 10px 12px;
+            margin-bottom: 6px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            border-left: 4px solid #cbd5e1;
+            font-size: 0.9rem;
+        }
+
+        .transaction-item.income { border-left-color: #10b981; }
+        .transaction-item.expense { border-left-color: #ef4444; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Smart-Core Workspace</h2>
+
+        <div class="dashboard-grid">
+            <div class="card">
+                <h3>Net Wallet</h3>
+                <h1 id="balance">₹0.00</h1>
+            </div>
+            <div class="card goal-card">
+                <h3>Target Remainder</h3>
+                <h1 id="goalDisplay">₹0.00</h1>
+                <div class="progress-container">
+                    <div id="progressBar" class="progress-bar"></div>
+                </div>
+            </div>
+            <div id="barometer" class="barometer-card">
+                ⚠️ Spending Velocity Warning: Dynamic Runway is active.
+            </div>
+        </div>
+
+        <div id="alertBox" class="alert-box">
+            <p id="alertMessage"></p>
+        </div>
+
+        <div class="section-box">
+            <div class="section-title">🎯 Set Core Goal Strategy</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <input type="text" id="goalName" placeholder="Item Name (e.g., iPhone)">
+                </div>
+                <div class="form-group">
+                    <input type="number" id="goalAmount" placeholder="Target Price (₹)">
+                </div>
+            </div>
+            <button class="btn-blue" onclick="saveGoal()">Initialize Target State</button>
+        </div>
+
+        <div class="section-box">
+            <div class="section-title">💸 Financial Operations Router</div>
+            <div class="form-group">
+                <label for="category">Allocation Category</label>
+                <select id="category">
+                    <option value="Food & Dining">Food & Dining</option>
+                    <option value="Shopping & E-Commerce">Shopping & E-Commerce</option>
+                    <option value="Utilities & Rent">Utilities & Rent</option>
+                    <option value="Transport & Cabs">Transport & Cabs</option>
+                    <option value="Miscellaneous">Miscellaneous</option>
+                </select>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="amount">Quantifiable Value (₹)</label>
+                    <input type="number" id="amount" placeholder="0.00">
+                </div>
+                <div class="form-group">
+                    <label for="type">Operation Vector</label>
+                    <select id="type">
+                        <option value="income">Income Matrix (+)</option>
+                        <option value="expense">Expense Matrix (-)</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn-green" onclick="routeTransaction()">Execute Ledger Process</button>
+        </div>
+
+        <div class="section-box" style="margin-bottom: 0;">
+            <div class="section-title">📋 Production Audit Stream</div>
+            <ul id="list" class="transaction-list"></ul>
+        </div>
+    </div>
+
+    <script>
+        // Memory Architecture - Instantiating state vectors from LocalStorage cache
+        let state = JSON.parse(localStorage.getItem('FINANCE_STATE')) || {
+            balance: 0,
+            targetGoal: 0,
+            targetName: "",
+            transactions: []
+        };
+
+        // UI Compilation Hooks
+        const balanceDisplay = document.getElementById('balance');
+        const goalDisplay = document.getElementById('goalDisplay');
+        const progressBar = document.getElementById('progressBar');
+        const barometer = document.getElementById('barometer');
+        const alertBox = document.getElementById('alertBox');
+        const alertMessage = document.getElementById('alertMessage');
+        const listDisplay = document.getElementById('list');
+
+        // Trigger dynamic compilation on init
+        window.onload = function() {
+            compileDOM();
+        };
+
+        function writeToCache() {
+            localStorage.setItem('FINANCE_STATE', JSON.stringify(state));
+        }
+
+        function saveGoal() {
+            const name = document.getElementById('goalName').value.trim();
+            const val = parseFloat(document.getElementById('goalAmount').value);
+
+            if (name === '' || isNaN(val) || val <= 0) {
+                alert('Parsing Exception: Invalid String identity or Numeric parameter.');
+                return;
+            }
+
+            state.targetName = name;
+            state.targetGoal = val;
+            
+            writeToCache();
+            triggerAlertBox('#d1e7dd', '#0f5132', '#155724', `🎯 Success: Budget parameters committed for objective "<strong>${state.targetName}</strong>" at target boundary ₹${state.targetGoal.toFixed(2)}.`);
+            compileDOM();
+        }
+
+        function triggerAlertBox(bg, border, text, msg) {
+            alertBox.style.display = 'block';
+            alertBox.style.background = bg;
+            alertBox.style.borderLeftColor = border;
+            alertBox.style.color = text;
+            alertMessage.innerHTML = msg;
+        }
+
+        function compileDOM() {
+            balanceDisplay.innerText = `₹${state.balance.toFixed(2)}`;
+            listDisplay.innerHTML = '';
+
+            // Populate activity ledger matrix
+            state.transactions.forEach(t => {
+                const li = document.createElement('li');
+                li.classList.add('transaction-item', t.type);
+                const sign = t.type === 'income' ? '+' : '-';
+                li.innerHTML = `<strong>[${t.category}]</strong> <span>${sign}₹${t.amount.toFixed(2)}</span>`;
+                listDisplay.appendChild(li);
+            });
+
+            // Evaluate Goal Vector Progression
+            if (state.targetGoal > 0) {
+                let offset = state.targetGoal - state.balance;
+                if (offset <= 0) {
+                    goalDisplay.innerText = "Fulfilled! 🏆";
+                    progressBar.style.width = "100%";
+                } else {
+                    goalDisplay.innerText = `₹${offset.toFixed(2)}`;
+                    progressBar.style.width = `${Math.min((state.balance / state.targetGoal) * 100, 100)}%`;
+                }
+            } else {
+                goalDisplay.innerText = "₹0.00";
+                progressBar.style.width = "0%";
+            }
+
+            calculateVelocityBarometer();
+        }
+
+        // Mathematical Velocity Module: Evaluates Run-rate to projection modeling
+        function calculateVelocityBarometer() {
+            const expenseItems = state.transactions.filter(t => t.type === 'expense');
+            if (expenseItems.length < 2 || state.balance <= 0) {
+                barometer.style.display = 'none';
+                return;
+            }
+
+            let cumulativeDebit = expenseItems.reduce((acc, t) => acc + t.amount, 0);
+            let operationalVelocity = cumulativeDebit / state.transactions.length; // Cost unit metric per structural action
+            let remainingOperationsRunway = Math.floor(state.balance / operationalVelocity);
+
+            barometer.style.display = 'block';
+            if (remainingOperationsRunway <= 3) {
+                barometer.style.background = '#ef4444';
+                barometer.innerText = `🚨 CRITICAL BURNRATE: Only ${remainingOperationsRunway} allocation vectors left before bankruptcy!`;
+            } else {
+                barometer.style.background = '#f59e0b';
+                barometer.innerText = `⚠️ Spending Velocity Forecast: Runway clear for ~${remainingOperationsRunway} operations.`;
+            }
+        }
+
+        function getDeductiveSuggestion(cat) {
+            switch(cat) {
+                case 'Food & Dining': return "Deductive Action: Outsource less to e-catering (Zomato/Swiggy). In-house culinary workflows conserve up to 65% of asset allocation.";
+                case 'Shopping & E-Commerce': return "Deductive Action: Implement structural 48-hour token buffer on digital baskets to prevent dopamine-triggered impulse debits.";
+                case 'Utilities & Rent': return "Deductive Action: Audit constant vampire-draw appliance architectures to slash static monthly overhead constraints.";
+                case 'Transport & Cabs': return "Deductive Action: Optimize micro-mobility parameters or aggregate transport configurations to lower peak surge pricing coefficients.";
+                default: return "Deductive Action: Scale down discretionary luxury thresholds to compress variance margins.";
+            }
+        }
+
+        function routeTransaction() {
+            const cat = document.getElementById('category').value;
+            const value = parseFloat(document.getElementById('amount').value);
+            const opVector = document.getElementById('type').value;
+
+            if (isNaN(value) || value <= 0) {
+                alert('Validation Alert: Quantifiable input must resolve to a positive numeric execution asset.');
+                return;
+            }
+
+            alertBox.style.display = 'none';
+
+            if (opVector === 'expense') {
+                // Intercept Logic Framework
+                if (state.targetGoal > 0 && (state.balance - value) < state.targetGoal) {
+                    let calculatedImpact = ((value / state.targetGoal) * 100).toFixed(1);
+                    
+                    let permitAuthorization = confirm(`⚠️ Core Intercept Triggered!\n\nExecuting a debit of ₹${value.toFixed(2)} for "${cat}" will systematically penalize your target baseline by ${calculatedImpact}% relative to your objective "${state.targetName}".\n\nOverride restriction and execute debit?`);
+                    
+                    if (!permitAuthorization) {
+                        triggerAlertBox('#fef3c7', '#f59e0b', '#78350f', `👏 Operation Suspended: System saved budget parameters to protect target alignment for your <strong>${state.targetName}</strong>!`);
+                        document.getElementById('amount').value = '';
+                        return;
+                    }
+                }
+                state.balance -= value;
+            } else {
+                state.balance += value;
+            }
+
+            // Write into trace list matrix
+            state.transactions.unshift({ category: cat, amount: value, type: opVector });
+            
+            // Heavy cost validation notification check
+            if (opVector === 'expense' && value >= 5000) {
+                const insights = getDeductiveSuggestion(cat);
+                triggerAlertBox('#fff9db', '#f59e0b', '#78350f', `🚨 Heavy Cost Anomaly Detected (₹${value.toFixed(2)} allocated to ${cat}).<br><br>💡 <strong>${insights}</strong>`);
+            }
+
+            writeToCache();
+            compileDOM();
+
+            document.getElementById('amount').value = '';
+        }
+    </script>
+</body>
+</html>
